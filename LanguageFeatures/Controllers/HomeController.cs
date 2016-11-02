@@ -27,7 +27,7 @@ namespace LanguageFeatures.Controllers {
                    new Product {Name="Kayak",Price=275M,Category="Watersports" },
                     new Product {Name="Lifejacket",Price=48.95M,Category="Watersports"},
                     new Product {Name="Soccer ball" ,Price=19.50M,Category="Soccer"},
-                    new  Product {Name="Corner flag",Price=34.95M,Category="Soccer" }
+                    //new  Product {Name="Corner flag",Price=34.95M,Category="Soccer" }
             };
 
             return PartialView(products);
