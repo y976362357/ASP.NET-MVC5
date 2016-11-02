@@ -1,0 +1,40 @@
+﻿@model IEnumerable<LanguageFeatures.Models.Product>
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script>
+        $(document).ready(function () {
+            $.getJSON("/Home/_GetProducts", function (data) {
+                var tr;
+                //把每一行的数据加到table中
+                //注意：js中智能提示不完全：i < data.length;,,data[i].Name....
+                for (var i = 0; i < data.length; i++) {
+                    tr = $("<tr/>");
+                    tr.append("<td>" + data[i].ProductId + "</td>");
+                    tr.append("<td>" + data[i].Name + "</td>");
+                    tr.append("<td>" + data[i].Description + "</td>");
+                    tr.append("<td>" + data[i].Category + "</td>");
+                    tr.append("<td>" + data[i].Price + "</td>");
+                    //通过css找到table,把数据绑定到table中
+                    $(".myTable").append(tr);
+                }
+
+            })
+        })
+</script>
+
+<table class="myTable">
+    <thead>
+        <tr>
+            <th>ProductId</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+
+

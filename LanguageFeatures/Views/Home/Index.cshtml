@@ -1,0 +1,32 @@
+﻿@*@using LanguageFeatures.Models
+@model  Product*@
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript">
+        //方法二，通过Jquery的load方法，直接加载分部视图
+        $(document).ready(function () {
+            //注意这里的#myDIV，是CSS选择器
+            $("#myDIV").load("/Home/ProductList").show();
+
+        })
+    </script>
+</head>
+<body>
+    <div>
+        @Html.Partial("ProductList")
+    </div>
+    <div id="myDIV"> 
+        
+    </div>
+</body>
+</html>
