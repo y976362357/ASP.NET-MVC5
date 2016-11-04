@@ -1,0 +1,70 @@
+﻿@*@model IEnumerable<LanguageFeatures.Models.Product>*@
+@model PagedList.IPagedList<LanguageFeatures.Models.Product>
+@using PagedList.Mvc
+<link  href="~/Content/PagedList.css" rel="stylesheet">
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ProductListPage</title>
+</head>
+<body>
+ 
+    <form action="/Home/Index" method="post">
+
+    </form>
+   @using(Html.BeginForm("ProductList","Home",FormMethod.Get)) {
+       <p>
+            @Html.RouteLink("dd",new { id="1"}) 
+           @Html.TextBox("text1","t1")
+           @Html.TextBox("text1","t1",new { @style="width:300px"})
+            
+           Find By Name:@Html.TextBox("searchString",ViewBag.CurrentFilter as string)
+           <input type="submit" value="seacher" />
+       </p>
+   }
+    <table class="table">
+        <tr>
+            <th>
+                @*@Html.DisplayNameFor(model => model.Name)*@
+                @Html.ActionLink("Name","ProductList",new { sortOrder = ViewBag.sortOrder,currentFilter=ViewBag.CurrentFilter })
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Category
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach(var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td></td>
+            </tr>
+        }
+
+    </table>
+    Page@(Model.PageCount<Model.PageNumber?0:Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model,page => Url.Action("ProductList",new { page,sortOrder=ViewBag.CurrentSort,currentFilter=ViewBag.CurrentFilter}))
+</body>
+</html>

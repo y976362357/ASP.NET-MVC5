@@ -5,40 +5,151 @@ using System.Linq;
 using System;
 using System.Text;
 using System.Data;
+using PagedList;
+using LanguageFeatures.Entity;
 
 namespace LanguageFeatures.Controllers {
+
+
     public class HomeController:Controller {
         //定义及初始化一个对象
         Product myProduct = new Product() {
             ProductId = 1,
             Name = "Kayak",
-            Description="A boat for on person",
-            Category="Watersports",
-            Price=275M
+            Description = "A boat for on person",
+            Category = "Watersports",
+            Price = 275M,
+
         };
 
+            
+
+        public int CheckBeer(List<Beer> beers) {
+            //检测瓶子数量》2
+            //检测盖子数量》4            
+            var twoBottle = beers.Where(b => b.Bottle == 1).Take(2);//取出bottle=1的前两个
+            var fourCap = beers.Where(b => b.Cap == 1).Take(4);//取出bottle=1的前两个            
+            if(twoBottle.Count() >= 2) {
+                foreach(var item in twoBottle) {
+                    beers.Find(b => b.id == item.id).Bottle = 0;//设置为0                  
+                }
+                beers.Add(new Beer() {
+                    id = beers.Count() + 1,
+                    Bottle = 1,
+                    Cap = 1
+                });
+                Console.WriteLine(beers.Count());
+                CheckBeer(beers);            
+            }
+
+            if(fourCap.Count() >= 4) {
+                foreach(var item in fourCap) {
+                    beers.Find(b => b.id == item.id).Cap = 0;//设置为0                  
+                }
+                beers.Add(new Beer() {
+                    id = beers.Count() + 1,
+                    Bottle = 1,
+                    Cap = 1
+                });
+                Console.WriteLine(beers.Count());
+                CheckBeer(beers);
+            }
+            return beers.Count();
+        }
+
+ 
+
         public ActionResult Index() {
-            //return "A test";
+            //using (var i=new ModelTest()) {
+            //    i
+
+            //}
+            //ModelTest m = new ModelTest();
+            //var a = from p in m.MyEntities
+            //        select new { p.Name,p.Id };
+            List<Beer> beers = new List<Beer> {
+                new Beer() { id=1,Bottle=1,Cap=1},
+                new Beer() { id=2,Bottle=1,Cap=1},
+                new Beer() { id=3,Bottle=1,Cap=1},
+                new Beer() { id=4,Bottle=1,Cap=1},
+                new Beer() { id=5,Bottle=1,Cap=1},
+            };
+            int i = CheckBeer(beers);
+            ViewBag.i = i;
             return View();
         }
 
-        public PartialViewResult ProductList() {
-            List<Product> products = new List<Product>{
-                   new Product {Name="Kayak",Price=275M,Category="Watersports" },
-                    new Product {Name="Lifejacket",Price=48.95M,Category="Watersports"},
-                    new Product {Name="Soccer ball" ,Price=19.50M,Category="Soccer"},
-                    //new  Product {Name="Corner flag",Price=34.95M,Category="Soccer" }
-            };
-
-            return PartialView(products);
+        public ActionResult IndexRouteData(string controller,string action,string id,string name) {
+            ViewBag.p1 = controller;
+            ViewBag.p2 = action;
+            ViewBag.p3 = id;
+            ViewBag.p4 = name;
+            return View();
         }
 
-        public JsonResult _GetProducts(){
+        public ActionResult ProductList(string sortOrder,string searchString,string currentFilter,int? page) {
+
+            ViewBag.currentSort = sortOrder;
+            ViewBag.CurrentFilter = searchString;
             List<Product> products = new List<Product>{
                    new Product {Name="Kayak",Price=275M,Category="Watersports" },
                     new Product {Name="Lifejacket",Price=48.95M,Category="Watersports"},
                     new Product {Name="Soccer ball" ,Price=19.50M,Category="Soccer"},
-                    new  Product {Name="Corner flag",Price=34.95M,Category="Soccer" }
+                    new  Product {Name="Corner 5",Price=34.95M,Category="Soccer1" },
+                    new  Product {Name="Corner 3",Price=34.95M,Category="2" },
+                    new  Product {Name="Corner 4",Price=34.95M,Category="Soccer3" },
+                    new  Product {Name="Corner 2",Price=34.95M,Category="Soccer4" },
+                    new  Product {Name="Corner 1",Price=34.95M,Category="Soccer5" }
+            };
+            IEnumerable<Product> re = products;
+            if(searchString != null) {
+                page = 1;
+            } else {
+                searchString = currentFilter;
+            }
+            //查询
+            if(!string.IsNullOrEmpty(searchString)) {
+                re = re.Where(p => p.Name.Contains(searchString));
+            }
+            //排序参数
+            ViewBag.sortOrder = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "name_asc";
+            //排序
+            switch(sortOrder) {
+                case "name_desc":
+                    re = re.OrderByDescending(p => p.Name);
+                    ViewBag.sortOrder = "name_asc";
+                    break;
+                default:
+                    re = re.OrderBy(p => p.Name);
+                    ViewBag.sortOrder = "name_desc";
+                    break;
+            }
+            int pageSize = 2;
+            int pageNuber = (page ?? 1);
+            return View("ProductListPage",re.ToPagedList(pageNuber,pageSize));
+
+        }
+        //public PartialViewResult ProductList() {
+        //    List<Product> products = new List<Product>{
+        //           new Product {Name="Kayak",Price=275M,Category="Watersports" },
+        //            new Product {Name="Lifejacket",Price=48.95M,Category="Watersports"},
+        //            new Product {Name="Soccer ball" ,Price=19.50M,Category="Soccer"},
+        //            //new  Product {Name="Corner flag",Price=34.95M,Category="Soccer" }
+        //    };
+
+        //    return PartialView(products);
+        //}
+
+        public JsonResult _GetProducts() {
+            List<Product> products = new List<Product>{
+                   new Product {Name="Kayak",Price=275M,Category="Watersports" },
+                    new Product {Name="Lifejacket",Price=48.95M,Category="Watersports"},
+                    new Product {Name="Soccer ball" ,Price=19.50M,Category="Soccer"},
+                    new  Product {Name="Corner 5",Price=34.95M,Category="Soccer1" },
+                    new  Product {Name="Corner 3",Price=34.95M,Category="2" },
+                    new  Product {Name="Corner 4",Price=34.95M,Category="Soccer3" },
+                    new  Product {Name="Corner 2",Price=34.95M,Category="Soccer4" },
+                    new  Product {Name="Corner 1",Price=34.95M,Category="Soccer5" }
             };
             return Json(products,JsonRequestBehavior.AllowGet);
             //return PartialView("_GetProducts",JsonRequestBehavior.AllowGet);
@@ -172,12 +283,12 @@ namespace LanguageFeatures.Controllers {
                     new Product {Name="Soccer ball" ,Price=19.50M,Category="Soccer"},
                     new  Product {Name="Corner flag",Price=34.95M,Category="Soccer" }
             };
-            
+
             Product[] foundProducts = new Product[3];
-           // Action<IEnumerable<Product>> a = PrintProduct;
+            // Action<IEnumerable<Product>> a = PrintProduct;
             //对数组进行排序        
             Array.Sort(products,(item1,item2) => { return Comparer<decimal>.Default.Compare(item1.Price,item2.Price); });
-          
+
             //对数组进行排序                                      
             //Array.Sort(products,(i1,i2)=> { return Comparer<string>.Default.Compare(i1.Name,i2.Name); });
 
@@ -198,28 +309,28 @@ namespace LanguageFeatures.Controllers {
 
             //按Category分组，获取所有Category，并获取各Category 中Price最大值
             var fff = from p in products
-                      where p.Category!=null
-                      where p.Category!=""
+                      where p.Category != null
+                      where p.Category != ""
                       group p by p.Category into g
-                      select new { g.Key , MaxPrice=g.Max(p=>p.Price)};
+                      select new { g.Key,MaxPrice = g.Max(p => p.Price) };
 
             //多列分组
             var f = from p in products
                     group p by new { p.Category,p.Name } into g
                     select new { g.Key };
             DataTable dt = new DataTable();
-           // dt.AsEnumerable
+            // dt.AsEnumerable
             var ff = from p in products
                      group p by new { c = p.Price > 20 } into g
                      select g;
-
+            products.GroupBy(p => p.Category);
             //products.Except<Product>(fonudProducts2);
 
-            List < int > arr = new List<int>() { 1,2,3,4,5,6,7 };
+            List<int> arr = new List<int>() { 1,2,3,4,5,6,7 };
             var result = arr.Where(a => { return a > 3; }).Sum();
             arr.SelectMany<int,string>(a => { return new List<string> { "a",a.ToString() }; });
             Console.WriteLine(result);
-            
+
             //Console.ReadKey();
 
 
@@ -227,7 +338,7 @@ namespace LanguageFeatures.Controllers {
             //Category="Watersports"                         
             int count = 0;
             StringBuilder sb = new StringBuilder();
-            foreach(var p in f) {                
+            foreach(var p in f) {
                 sb.AppendFormat("Category:{0},MaxPrice:{1} ",p.Key.Category,p.Key.Name);
                 //   sb.Append(p.Name + " ");                
                 //sb.AppendFormat("Price:{0},",p.Price);
@@ -239,6 +350,6 @@ namespace LanguageFeatures.Controllers {
             return View("Result",(object)sb.ToString());
         }
 
-   
+
     }
 }

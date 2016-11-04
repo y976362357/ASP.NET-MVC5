@@ -22,7 +22,10 @@ using System.Web;
 *└──────────────────────────────────┘
 */
 namespace LanguageFeatures.Models {
-    public class Product {
+    public class Product {        
+
+
+        private string ID { get; }
         ///语言特性，自动属性与规则属性
         /// <summary>
         /// 产品ID
@@ -44,5 +47,9 @@ namespace LanguageFeatures.Models {
         /// 产品分类
         /// </summary>
         public string Category { get; set; }
+
+      
     }
+
+
 }

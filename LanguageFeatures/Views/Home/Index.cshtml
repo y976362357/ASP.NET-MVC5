@@ -17,13 +17,14 @@
         $(document).ready(function () {
             //注意这里的#myDIV，是CSS选择器
             $("#myDIV").load("/Home/ProductList").show();
-
         })
     </script>
 </head>
 <body>
     <div>
+        @ViewBag.i
         @*@Html.Partial("ProductList")*@
+        
     </div>
     <div id="myDIV"> 
         
